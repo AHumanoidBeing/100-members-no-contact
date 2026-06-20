@@ -11,6 +11,7 @@ bounce = 0.5
 radius = 253.04396
 
 [node name="Player" type="RigidBody2D" unique_id=1992090891]
+mass = 0.5
 physics_material_override = SubResource("PhysicsMaterial_7buym")
 gravity_scale = 0.0
 script = ExtResource("1_7buym")
