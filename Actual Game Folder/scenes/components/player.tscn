@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bn5pltvin1n7e" path="res://Actual Game Folder/scripts/player.gd" id="1_7buym"]
 [ext_resource type="Texture2D" uid="uid://dwmuxqubqjmje" path="res://Miscellanious Assets Dump/Image/sample_beyblade.png" id="2_7buym"]
+[ext_resource type="AudioStream" uid="uid://c055dhcymjmqp" path="res://Miscellanious Assets Dump/Audio/ripcord.mp3" id="3_kmxop"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_7buym"]
 bounce = 0.5
@@ -23,3 +24,7 @@ texture = ExtResource("2_7buym")
 position = Vector2(-3.8146973e-06, -3.8146973e-06)
 scale = Vector2(0.24899998, 0.24899998)
 shape = SubResource("CircleShape2D_kmxop")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=739930474]
+stream = ExtResource("3_kmxop")
+autoplay = true
