@@ -10,12 +10,12 @@ bounce = 0.5
 [sub_resource type="CircleShape2D" id="CircleShape2D_kmxop"]
 radius = 84.0
 
-[node name="Player" type="RigidBody2D" unique_id=1992090891 node_paths=PackedStringArray("sprite")]
+[node name="Player" type="RigidBody2D" unique_id=1992090891]
 mass = 0.5
 physics_material_override = SubResource("PhysicsMaterial_7buym")
 gravity_scale = 0.0
+contact_monitor = true
 script = ExtResource("1_7buym")
-sprite = NodePath("Sprite2D")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=2048784928]
 position = Vector2(-3.8146973e-06, -3.8146973e-06)
@@ -33,13 +33,4 @@ autoplay = true
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1800028339]
 zoom = Vector2(4, 4)
 
-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=648291034]
-
-[node name="SpinBar" type="ProgressBar" parent="CanvasLayer" unique_id=847563921]
-layout_mode = 0
-offset_left = 16.0
-offset_top = 16.0
-offset_right = 216.0
-offset_bottom = 36.0
-value = 100.0
-show_percentage = false
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

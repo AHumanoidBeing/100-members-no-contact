@@ -7,40 +7,62 @@ extends RigidBody2D
 # What's the mechanic like? I'm not sure about the core mechanic right now
 # Is player going to control the beyblade? Against who? It could be speedrun type game.
 
-@export var starting_move_strength:float = 30
-@export var move_strength_decay:float = 2
-#torque is the fancy physics term for rotational force
-@export var starting_spin_torque:float = 10000
-@export var spin_deceleration:float = 10
-@export var sprite : Sprite2D
+# export these values to make it easier to adjust
+# we can tweek these until the game feels fun
+const SPARKS_SCENE = preload("res://Actual Game Folder/scenes/components/sparks.tscn")
 
-var move_force_magnitude: float = 20;
-var remaining_move_strength: float = starting_move_strength
-var spin_torque: float = 10000
+@export var starting_spin_velocity:float = 30
+@export var default_velocity: float = 20
+@export var spin_velocity_drop_on_collision: float = 1
+@export var spin_velocity_drop_over_time: float = 1
+
+var current_velocity: Vector2 = Vector2(0, 0)
+var spin_velocity: float = starting_spin_velocity
 var player_died: bool = false
+
+func _ready() -> void:
+	# this is necessary for _on_body_entered, 1 is technically enough for just the player but with multiple bayblades we might need to increase this value.
+	max_contacts_reported = 5
 
 func _physics_process(delta: float) -> void:
 
-	var input_direction = Input.get_vector("left","right","up","down")
+	$Sprite2D.rotate(spin_velocity * delta)
 
-	spin_torque -= spin_deceleration
-	if(spin_torque < 0):
-		spin_torque = 0
-		player_died = true
-	var multiplier = 1 # counter-clockwise
-	if(input_direction.x > 0 || input_direction.y > 0):
-		multiplier = -1 # clockwise
-	apply_torque(spin_torque * multiplier)
-
-	if remaining_move_strength > 0:
-		remaining_move_strength -= delta * move_strength_decay
+	if spin_velocity > 0:
+		spin_velocity -= spin_velocity_drop_over_time * delta
 	else:
 		player_died = true
+		spin_velocity = 0 # prevents slight backspin on player death
 	
-	
-	
-	var current_force = input_direction * move_force_magnitude
+	current_velocity = Vector2(0, 0);
 
-	apply_force(current_force * remaining_move_strength)
+	if Input.is_action_pressed("left"):
+		current_velocity[0] -= default_velocity;
+
+	if Input.is_action_pressed("right"):
+		current_velocity[0] += default_velocity;
+
+	if Input.is_action_pressed("up"):
+		current_velocity[1] -= default_velocity;
+
+	if Input.is_action_pressed("down"):
+		current_velocity[1] += default_velocity;
+
+	apply_force(current_velocity * spin_velocity) #Just proprtional to spin velocity rn, some physics guy please make cleaner logic idk how beyblades work
 
 	pass
+
+# slightly lower spin velocity every time there is a collision with another rigid body
+# we can add ways to increase your spin later to give the player more control
+func _on_body_entered(_body: Node) -> void:
+	spin_velocity -= spin_velocity_drop_on_collision
+	pass
+
+func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
+	var contact_count = get_contact_count()
+	if contact_count > 0:
+		for i in range(contact_count):
+			var sparks = SPARKS_SCENE.instantiate()
+			sparks.global_position = state.get_contact_local_position(i)
+			get_parent().add_child(sparks)
+			get_tree().create_timer(0.1).timeout.connect(sparks.queue_free)
